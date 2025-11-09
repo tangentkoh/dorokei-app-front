@@ -1,3 +1,4 @@
+/*
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
@@ -33,3 +34,36 @@ function App() {
 }
 
 export default App
+*/
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// 作成した3つのコンポーネントをインポート
+import StartPage from "./start.jsx";
+import MakeRoomPage from "./makeroom.jsx";
+import JoinRoomPage from "./joinroom.jsx";
+
+// ルート（パスとコンポーネントの対応）を定義
+const router = createBrowserRouter([
+  {
+    path: "/", // アプリのルートURL（例: http://localhost:5173/）
+    element: <StartPage />,
+  },
+  {
+    path: "make", // 部屋を作るページ（例: http://localhost:5173/make）
+    element: <MakeRoomPage />,
+  },
+  {
+    path: "join", // 部屋に入るページ（例: http://localhost:5173/join）
+    element: <JoinRoomPage />,
+  },
+]);
+
+function App() {
+  return (
+    // 定義したルーターをアプリケーションに適用
+    <RouterProvider router={router} />
+  );
+}
+
+export default App;
