@@ -35,6 +35,7 @@ function App() {
 
 export default App
 */
+// 以下はテスト用のそれなので気にしないで下さい
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -46,24 +47,21 @@ import JoinRoomPage from "./joinroom.jsx";
 // ルート（パスとコンポーネントの対応）を定義
 const router = createBrowserRouter([
   {
-    path: "/", // アプリのルートURL（例: http://localhost:5173/）
+    path: "/", // アプリのルートURL
     element: <StartPage />,
   },
   {
-    path: "make", // 部屋を作るページ（例: http://localhost:5173/make）
+    path: "make", // 部屋を作るページ
     element: <MakeRoomPage />,
   },
   {
-    path: "join", // 部屋に入るページ（例: http://localhost:5173/join）
+    path: "join", // 部屋に入るページ
     element: <JoinRoomPage />,
   },
 ]);
 
 function App() {
-  return (
-    // 定義したルーターをアプリケーションに適用
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

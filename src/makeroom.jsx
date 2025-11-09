@@ -2,9 +2,8 @@ import React from "react";
 
 // スタイルをオブジェクトとして定義
 const styles = {
-  // 🎨 全体コンテナ
+  // 全体のコンテナ
   container: {
-    // 薄い紫色の背景
     backgroundColor: "#f3e5f5",
     minHeight: "100vh",
     display: "flex",
@@ -15,9 +14,9 @@ const styles = {
     margin: "0",
   },
 
-  // 🟣 ヘッダー部分
+  // ヘッダー部分
   header: {
-    backgroundColor: "#ce93d8", // 少し濃いめの紫色
+    backgroundColor: "#ce93d8",
     width: "90%",
     maxWidth: "400px",
     padding: "20px 0",
@@ -31,7 +30,7 @@ const styles = {
     margin: "0",
   },
 
-  // 📱 中央のコンテンツ
+  // 中央のコンテンツ
   mainContent: {
     flexGrow: 1,
     display: "flex",
@@ -44,7 +43,7 @@ const styles = {
     textAlign: "center",
   },
 
-  // 📝 入力欄
+  // 入力欄
   inputField: {
     width: "100%",
     padding: "10px",
@@ -55,18 +54,17 @@ const styles = {
     textAlign: "center",
   },
 
-  // 🔘 作成ボタンコンテナ（右下に配置）
+  // 作成ボタンコンテナ（右下に配置）
   buttonContainer: {
     width: "100%",
     maxWidth: "400px",
     display: "flex",
-    justifyContent: "flex-end", // 右寄せにする
-    padding: "0 20px 40px", // 下に余白
+    justifyContent: "flex-end",
+    padding: "0 20px 40px",
     boxSizing: "border-box",
-    // 画面下部に固定したい場合は position: 'fixed', bottom: 0, などの追加が必要ですが、今回はコンテンツに続く形で配置します
   },
 
-  // 🔘 ボタン
+  // ボタン
   button: {
     padding: "12px 20px",
     fontSize: "18px",
@@ -74,7 +72,7 @@ const styles = {
     borderRadius: "8px",
     border: "none",
     cursor: "pointer",
-    backgroundColor: "#ab47bc", // 紫色のボタン
+    backgroundColor: "#ab47bc",
     color: "white",
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
   },
@@ -98,14 +96,14 @@ const MakeRoomPage = () => {
         {/* 合言葉入力欄 */}
         <input
           type="text"
-          placeholder="合言葉（パスワード）"
+          placeholder="合言葉"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={styles.inputField}
         />
       </div>
 
-      {/* 画面右下のボタン（ここではレイアウトを調整するため、画面下部に寄せる） */}
+      {/* 画面右下のボタン*/}
       <div style={styles.buttonContainer}>
         <button style={styles.button}>作成</button>
       </div>

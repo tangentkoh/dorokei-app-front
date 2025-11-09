@@ -1,8 +1,8 @@
 import React from "react";
 
-// スタイルをオブジェクトとして定義 (makeroom.jsxと同じスタイルを流用)
+// スタイルをオブジェクトとして定義
 const styles = {
-  // 🎨 全体コンテナ
+  // 全体コンテナ
   container: {
     backgroundColor: "#f3e5f5",
     minHeight: "100vh",
@@ -14,7 +14,7 @@ const styles = {
     margin: "0",
   },
 
-  // 🟣 ヘッダー部分
+  // ヘッダー部分
   header: {
     backgroundColor: "#ce93d8",
     width: "90%",
@@ -30,7 +30,7 @@ const styles = {
     margin: "0",
   },
 
-  // 📱 中央のコンテンツ
+  // 中央のコンテンツ
   mainContent: {
     flexGrow: 1,
     display: "flex",
@@ -43,7 +43,7 @@ const styles = {
     textAlign: "center",
   },
 
-  // 📝 入力欄
+  // 入力欄
   inputField: {
     width: "100%",
     padding: "10px",
@@ -54,17 +54,17 @@ const styles = {
     textAlign: "center",
   },
 
-  // 🔘 入るボタンコンテナ（右下に配置）
+  // 入るボタンコンテナ（右下に配置）
   buttonContainer: {
     width: "100%",
     maxWidth: "400px",
     display: "flex",
-    justifyContent: "flex-end", // 右寄せにする
+    justifyContent: "flex-end",
     padding: "0 20px 40px",
     boxSizing: "border-box",
   },
 
-  // 🔘 ボタン
+  // ボタン
   button: {
     padding: "12px 20px",
     fontSize: "18px",
@@ -96,7 +96,7 @@ const JoinRoomPage = () => {
         {/* 合言葉入力欄 */}
         <input
           type="text"
-          placeholder="合言葉（パスワード）"
+          placeholder="合言葉"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={styles.inputField}
