@@ -64,7 +64,7 @@ const page = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>robi-</h1>
+      <h1 className={styles.title}>ロビー</h1>
       <div className={styles.flexBoxColumn}>
         <button onClick={addPost}>部屋を解散する</button>
         <button onClick={addPost}>ルール変更</button>
