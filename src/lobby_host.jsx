@@ -62,12 +62,18 @@ const page = () => {
     setPosts(filteredPosts);
   };
 
+  const [isShut, setisShut] = useState(False);
+
+  const disband = (e) => {};
+  const changerule = (e) => {};
+  const start = (e) => {};
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>ロビー</h1>
       <div className={styles.flexBoxColumn}>
-        <button onClick={addPost}>部屋を解散する</button>
-        <button onClick={addPost}>ルール変更</button>
+        <button onClick={disband}>部屋を解散する</button>
+        <button onClick={changerule}>ルール変更</button>
       </div>
       <div className={styles.postsList}>
         <h3 className={styles.postsTitle}>参加者一覧</h3>
@@ -78,10 +84,10 @@ const page = () => {
               <small className={styles.postTime}>{post.time}</small>
             </div>
             <p className={styles.postContent}>{post.content}</p>
-            <button onClick={() => deletePost(post.id)}>削除</button>
           </div>
         ))}
       </div>
+      <button onClick={start}>{isOn ? "部屋を閉め切る" : "開始する"}</button>
     </div>
   );
 };
