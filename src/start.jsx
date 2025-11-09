@@ -4,14 +4,12 @@ import React from "react";
 
 // スタイルをオブジェクトとして定義
 const styles = {
-  // 🎨 全体コンテナ
   container: {
-    // 薄い青色の背景
     backgroundColor: "#b2f6ffff",
-    minHeight: "100vh", // 画面いっぱいの高さ
+    minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center", // これにより子要素（HeaderとMainContent）が水平中央寄せになる
+    alignItems: "center",
     width: "100%",
     padding: "0",
     margin: "0",
@@ -19,9 +17,7 @@ const styles = {
 
   // ヘッダー部分
   header: {
-    // 黄緑の長方形
     backgroundColor: "#c5e1a5",
-    // UIを中央にまとめるため、中央コンテンツと同じ最大幅に制限
     width: "90%",
     maxWidth: "400px",
     padding: "20px 0",
@@ -35,13 +31,13 @@ const styles = {
     margin: "0",
   },
 
-  // 📱 中央のコンテンツ（入力欄とボタンを内包）
+  // 中央のコンテンツ（入力欄とボタンを内包）
   mainContent: {
     flexGrow: 1,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center", // 垂直方向の中央揃え
-    alignItems: "center", // 水平方向の中央揃え
+    justifyContent: "center",
+    alignItems: "center",
 
     // ヘッダーと同じ最大幅に制限
     width: "90%",
@@ -50,7 +46,7 @@ const styles = {
     textAlign: "center",
   },
 
-  // 📝 入力欄
+  // 入力欄
   inputField: {
     width: "100%",
     padding: "10px",
@@ -61,11 +57,11 @@ const styles = {
     textAlign: "center",
   },
 
-  // 👆 ボタンコンテナ
+  // ボタンコンテナ
   buttonContainer: {
     display: "flex",
     flexDirection: "column",
-    width: "100%", // 親要素 (mainContent) の幅に合わせる
+    width: "100%",
     gap: "15px",
     marginTop: "20px",
     marginBottom: "40px",
@@ -82,27 +78,26 @@ const styles = {
     transition: "background-color 0.3s",
   },
   createButton: {
-    backgroundColor: "#81c784", // 緑系
+    backgroundColor: "#81c784",
     color: "white",
   },
   joinButton: {
-    backgroundColor: "#64b5f6", // 青系
+    backgroundColor: "#64b5f6",
     color: "white",
   },
 };
 
 // Reactコンポーネントの定義
 const StartPage = () => {
-  // プレイヤーネームの入力値管理 (今は無機能)
+  // プレイヤーネーム
   const [playerName, setPlayerName] = React.useState("");
 
   return (
     <div style={styles.container}>
-      {/* 画面上部の黄緑の長方形とタイトル */}
+      {/* 全体のコンテナ */}
       <header style={styles.header}>
         <h1 style={styles.headerText}>ドロケイ支援アプリ</h1>
       </header>
-
       {/* 中央のコンテンツ（入力欄とボタンを内包） */}
       <div style={styles.mainContent}>
         <h2>プレイヤーネーム</h2>
