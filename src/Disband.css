@@ -1,0 +1,22 @@
+.center-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 縦方向中央 */
+  align-items: center; /* 横方向中央 */
+  height: 100vh; /* 画面全体の高さ */
+  background-color: #ffffff;
+}
+
+.center-text {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.center-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #82cbff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
