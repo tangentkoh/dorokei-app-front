@@ -1,0 +1,22 @@
+.center-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 横方向中央 */
+  height: 100vh; /* 画面全体の高さ */
+  width: 100vw; /* 画面全体の幅 */
+  background-color: #799fff;
+}
+
+.title-text {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.select-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #6aff92;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

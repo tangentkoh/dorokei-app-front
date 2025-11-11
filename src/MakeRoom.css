@@ -1,0 +1,37 @@
+.center-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 横方向中央 */
+  height: 100vh; /* 画面全体の高さ */
+  width: 100vw; /* 画面全体の幅 */
+  background-color: #bc79ff;
+}
+
+.title-text {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.read-text {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.select-button {
+  padding: 10px 20px;
+  font-size: 20px;
+  background-color: #6aff92;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.top-left-button {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  font-size: 20px;
+  padding: 10px 15px;
+  background-color: #ffaea5;
+  cursor: pointer;
+}
