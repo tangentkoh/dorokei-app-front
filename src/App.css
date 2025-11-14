@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+.debug-info {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  padding: 5px;
+  background-color: #eee;
+  font-size: 10px;
+  border: 1px solid #ccc; /* 見やすいように枠を追加 */
+  z-index: 100; /* 他の要素より手前に表示 */
+}
