@@ -5,7 +5,6 @@
 // ===============================================
 
 // 環境変数が設定されていない場合、開発用のデフォルトURLを使用
-// import.meta.env の型チェックを緩和するため、明示的に as string を使用
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_URL as string) || "http://localhost:3000";
 
@@ -39,8 +38,9 @@ interface ApiErrorResponse {
  * 共通のAPIリクエスト処理を行う
  * @param endpoint - APIエンドポイントのパス (例: /rooms/create)
  * @param method - HTTPメソッド (例: 'POST')
- * @param data - リクエストボディとして送信するデータ (デフォルト: null)
+ * @param data - リクエストボディとして送信するデータ (Record<string, unknown> | null)
  */
+// data の型を Record<string, unknown> とすることで、any の使用を回避
 const apiRequest = async <T>(
   endpoint: string,
   method: string,
@@ -48,7 +48,6 @@ const apiRequest = async <T>(
 ): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // RequestInit の型を明示的に指定
   const options: RequestInit = {
     method: method,
     headers: {
@@ -66,15 +65,15 @@ const apiRequest = async <T>(
     if (!response.ok) {
       let errorData: ApiErrorResponse | { message: string };
       try {
-        // response.json() の戻り値の型が推論できるように修正
         errorData = (await response.json()) as ApiErrorResponse;
       } catch {
+        // JSON解析失敗の場合
         throw new Error(
           `HTTP Error: ${response.status} ${response.statusText}`
         );
       }
 
-      // NestJSの一般的なエラー形式を想定し、メッセージを取得
+      // NestJSの一般的なエラー形式を想定
       const errorMessage =
         (errorData as ApiErrorResponse).message ||
         "不明なエラーが発生しました。";
@@ -85,10 +84,9 @@ const apiRequest = async <T>(
     // text が空でないか確認してからJSONを解析
     return text ? (JSON.parse(text) as T) : ({} as T);
   } catch (error) {
-    // 'error' の型が暗黙的に 'any' になるのを防ぐため、throwする前に型ガードを行う
+    // error は 'unknown' 型として処理
     console.error("API Request Failed:", error);
 
-    // error は 'unknown' 型として処理する必要がある
     if (error instanceof Error) {
       throw error; // Errorオブジェクトであればそのままスロー
     }
@@ -115,7 +113,6 @@ export const createRoom = async (
     playerName: playerName,
     passcode: passcode,
   };
-  // requestBodyが Record<string, any> 型なので、apiRequestの引数型と一致
   return apiRequest<RoomResponse>(endpoint, "POST", requestBody);
 };
 
