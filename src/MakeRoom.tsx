@@ -36,7 +36,7 @@ const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
 
       // 成功時: 遷移せず、成功メッセージを表示
       const playerIdSnippet =
-        roomData.playerld?.substring(0, 8) || "ID取得エラー";
+        roomData.playerId?.substring(0, 8) || "ID取得エラー";
 
       setSuccessMessage(
         `部屋作成成功！合言葉: ${roomData.passcode} (Player ID: ${playerIdSnippet}...)`
