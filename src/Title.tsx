@@ -20,7 +20,7 @@ const Title: React.FC<TitleProps> = ({
   // プレイヤーネームを親コンポーネントに保存し、画面遷移する
   const handleGoMakeRoom = () => {
     if (localPlayerName.length > 0) {
-      // 1文字でも入力したらOK [要件]
+      // 1文字でも入力したらOK
       setPlayerName(localPlayerName); // App.tsxで名前を保存
       goToMakeRoom();
     }
