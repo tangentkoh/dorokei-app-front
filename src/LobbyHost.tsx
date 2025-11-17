@@ -1,16 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LobbyHost.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 const LobbyHost: React.FC = () => {
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -泥棒`);
   const limitTime: number = 100;
   const police: number = 1;
   const thief: number = 2;
 
   const disbandRoom = () => {};
   const changeRules = () => {};
-  const shutRoom = () => {};
+  const shutRoom = async (): Promise<void> => {};
+  type Player_wait = {
+    //実際に表示される配列の定義
+    name: string;
+    role: "POLICE" | "THIEF";
+  };
 
+  const [players, setplayers] = useState<Player_wait[]>([]); //playerName,roleの配列定義
+
+  useWebSocket(
+    //websocket開始
+    "localhost:3001/websocket",
+    (data: string) => {
+      try {
+        const parsed = JSON.parse(data);
+        const PlayerName: string[] = parsed.players.map(
+          (p: { name: string }) => p.name
+        );
+        const Playerrole: ("POLICE" | "THIEF")[] = parsed.players.map(
+          (p: { role: "POLICE" | "THIEF" }) => p.role
+        );
+        const combined: Player_wait[] = PlayerName.map(
+          (name: string, index: number) => ({
+            name,
+            role: Playerrole[index],
+          })
+        );
+        setplayers(combined);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -35,8 +66,10 @@ const LobbyHost: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
-              <li key={index}>{item}</li>
+            {players.map((player, index) => (
+              <li key={index}>
+                {player.name} -{player.role}
+              </li>
             ))}
           </ul>
         </div>
@@ -44,5 +77,4 @@ const LobbyHost: React.FC = () => {
     </div>
   );
 };
-
 export default LobbyHost;
