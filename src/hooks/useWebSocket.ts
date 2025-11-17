@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { connectionWebsocket } from "../lib/websocket";
+import { connectionWebsocket } from "../lib/webSockets";
 
 export const useWebSocket = (
   url: string,
