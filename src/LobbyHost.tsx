@@ -3,21 +3,21 @@ import "./LobbyHost.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 
 const LobbyHost: React.FC = () => {
-  const limitTime: number = 100;
-  const police: number = 1;
-  const thief: number = 2;
+  const [limitTime, setLimitTime] = useState<number>(0);
+  const [police, setPoloce] = useState<number>(0);
+  const [thief, setThief] = useState<number>(0);
 
   const disbandRoom = () => {};
   const changeRules = () => {};
   const shutRoom = async (): Promise<void> => {};
 
-  type Player_wait = {
-    //実際に表示される配列の定義
+  type player = {
+    id: string;
     name: string;
     role: "POLICE" | "THIEF";
+    isCaptured: boolean;
   };
-
-  const [players, setplayers] = useState<Player_wait[]>([]); //playerName,roleの配列定義
+  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
 
   useWebSocket(
     //websocket開始
@@ -27,22 +27,15 @@ const LobbyHost: React.FC = () => {
         const parsed = JSON.parse(data); //オブジェクト化して、イベントで処理を分岐
         switch (parsed.type) {
           case "statusUpdated": //updatedイベントの処理
-            const PlayerName: string[] = parsed.players.map(
-              //player配列からnameだけを取り出す
-              (p: { name: string }) => p.name
+            const parsed_player: player[] = JSON.parse(data).players;
+            setLimitTime(parsed.durationSeconds / 60);
+            setThief(
+              parsed_player.filter((player) => player.role === "THIEF").length
             );
-            const Playerrole: ("POLICE" | "THIEF")[] = parsed.players.map(
-              //配列からroleだけを取り出す
-              (p: { role: "POLICE" | "THIEF" }) => p.role
+            setPoloce(
+              parsed_player.filter((player) => player.role === "POLICE").length
             );
-            const combined: Player_wait[] = PlayerName.map(
-              //nameとroleの結合
-              (name: string, index: number) => ({
-                name,
-                role: Playerrole[index],
-              })
-            );
-            setplayers(combined);
+            setplayers(parsed_player);
             break;
           case "terminatedNotification": //terminatedイベントの処理
             if (parsed.reason === "TERMINATED_BY_HOST") {
