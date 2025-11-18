@@ -10,6 +10,7 @@ const LobbyHost: React.FC = () => {
   const disbandRoom = () => {};
   const changeRules = () => {};
   const shutRoom = async (): Promise<void> => {};
+
   type Player_wait = {
     //実際に表示される配列の定義
     name: string;
@@ -23,20 +24,36 @@ const LobbyHost: React.FC = () => {
     "localhost:3001/websocket",
     (data: string) => {
       try {
-        const parsed = JSON.parse(data);
-        const PlayerName: string[] = parsed.players.map(
-          (p: { name: string }) => p.name
-        );
-        const Playerrole: ("POLICE" | "THIEF")[] = parsed.players.map(
-          (p: { role: "POLICE" | "THIEF" }) => p.role
-        );
-        const combined: Player_wait[] = PlayerName.map(
-          (name: string, index: number) => ({
-            name,
-            role: Playerrole[index],
-          })
-        );
-        setplayers(combined);
+        const parsed = JSON.parse(data); //オブジェクト化して、イベントで処理を分岐
+        switch (parsed.type) {
+          case "statusUpdated": //updatedイベントの処理
+            const PlayerName: string[] = parsed.players.map(
+              //player配列からnameだけを取り出す
+              (p: { name: string }) => p.name
+            );
+            const Playerrole: ("POLICE" | "THIEF")[] = parsed.players.map(
+              //配列からroleだけを取り出す
+              (p: { role: "POLICE" | "THIEF" }) => p.role
+            );
+            const combined: Player_wait[] = PlayerName.map(
+              //nameとroleの結合
+              (name: string, index: number) => ({
+                name,
+                role: Playerrole[index],
+              })
+            );
+            setplayers(combined);
+            break;
+          case "terminatedNotification": //terminatedイベントの処理
+            if (parsed.reason === "TERMINATED_BY_HOST") {
+              alert(parsed.message);
+              console.log(parsed.timestamp);
+            } else {
+              alert("通信エラー");
+              console.log(parsed);
+            }
+            break;
+        }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }
