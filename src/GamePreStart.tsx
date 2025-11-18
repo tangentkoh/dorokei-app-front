@@ -31,7 +31,7 @@ const GamePreStart: React.FC<Props> = () => {
       try {
         const parsed = JSON.parse(data);
         if (parsed.type === "timerTick") {
-          setRemaining(parsed.remainingSeconds); //残り時間を更新
+          setRemaining(parsed.gracePeriodRemaining); //残り時間を更新(?はなにか)
         } else {
           console.log("通信エラー");
         }
