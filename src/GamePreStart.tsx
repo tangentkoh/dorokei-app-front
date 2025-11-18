@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./GamePreStart.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 interface Player {
   id: string;
@@ -22,6 +23,23 @@ const GamePreStart: React.FC<Props> = () => {
     { id: "p2", name: "田中", role: "THIEF" },
     { id: "p3", name: "佐藤", role: "POLICE" },
   ]);
+
+  useWebSocket(
+    //websocket開始
+    "localhost:3001/websocket",
+    (data: string) => {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.type === "timerTick") {
+          setRemaining(parsed.remainingSeconds); //残り時間を更新
+        } else {
+          console.log("通信エラー");
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,9 +70,7 @@ const GamePreStart: React.FC<Props> = () => {
         ))}
       </ul>
 
-      <p className="text-sm text-gray-500 mt-3">
-        （ダミーモード：通信なし）
-      </p>
+      <p className="text-sm text-gray-500 mt-3">（ダミーモード：通信なし）</p>
     </div>
   );
 };
