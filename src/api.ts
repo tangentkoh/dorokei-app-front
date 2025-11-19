@@ -137,7 +137,7 @@ export const joinRoom = async (
 // 4. ゲームの状態取得とホスト操作 (2.)
 // ===============================================
 
-// RoomStatusResponse の型定義(足りない所は「神輿」から保管して下さい)
+// RoomStatusResponse の型定義(足りない所は「神輿」から補完して下さい)
 interface RoomStatusResponse {
   room: {
     id: string; // [cite: 19]
