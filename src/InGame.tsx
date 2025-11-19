@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./InGame.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 interface Player {
   id: string;
@@ -17,7 +18,7 @@ interface Props {
 }
 
 const InGame: React.FC<Props> = ({
-  currentPlayerId = "p1",  // デフォルト値
+  currentPlayerId = "p1", // デフォルト値
 }) => {
   const [remaining, setRemaining] = useState(300);
   const [players, setPlayers] = useState<Player[]>([
@@ -44,6 +45,45 @@ const InGame: React.FC<Props> = ({
   };
 
   const capturedList = players.filter((p) => p.isCaptured);
+
+  useWebSocket(
+    //websocket開始
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
+      try {
+        const player: Player[] = data.players;
+        setPlayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        setRemaining(data.remainingSeconds);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else if (data.reason === "TIME_UP") {
+          alert(data.message);
+          console.log(data);
+        } else if (data.reason === "ALL_CAPTURED") {
+          alert(data.message);
+          console.log(data);
+        } else {
+          alert("通信エラー");
+          console.log(data);
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
 
   return (
     <div className="text-center">

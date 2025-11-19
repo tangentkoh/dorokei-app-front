@@ -1,12 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LobbyPlayerShut.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 const LobbyPlayerShut: React.FC = () => {
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -泥棒`);
-  const limitTime: number = 100;
-  const police: number = 1;
-  const thief: number = 2;
+  const [limitTime, setLimitTime] = useState<number>(0);
+  const [police, setPoloce] = useState<number>(0);
+  const [thief, setThief] = useState<number>(0);
 
+  type player = {
+    id: string;
+    name: string;
+    role: "POLICE" | "THIEF";
+    isCaptured: boolean;
+  };
+  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+
+  useWebSocket(
+    //websocket開始
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
+      try {
+        const player: player[] = data.players;
+        setLimitTime(data.room.durationSeconds);
+        setThief(player.filter((player) => player.role === "THIEF").length);
+        setPoloce(player.filter((player) => player.role === "POLICE").length);
+        setplayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else {
+          alert("通信エラー");
+          console.log(data);
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -31,8 +74,10 @@ const LobbyPlayerShut: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
-              <li key={index}>{item}</li>
+            {players.map((player, index) => (
+              <li key={index}>
+                {player.name}-{player.role}
+              </li>
             ))}
           </ul>
         </div>

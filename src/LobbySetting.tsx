@@ -1,19 +1,20 @@
 import React, { useState } from "react";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 import "./LobbySetting.css";
 
 const LobbySetting: React.FC = () => {
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -`);
-  const [roles, setRoles] = useState<string[]>(Array(10).fill("泥棒"));
-
   const [limitTime, setLimitTime] = useState(100);
   const [police, setPolice] = useState(1);
   const [thief, setThief] = useState(2);
+  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
 
-  const handleRoleChange = (index: number, value: string) => {
-    const updatedRoles = [...roles];
-    updatedRoles[index] = value;
-    setRoles(updatedRoles);
+  const handleRoleChange = (index: number, value: "POLICE" | "THIEF") => {
+    const update: player = players[index];
+    update.role = value;
+    const updatedRoles: player[] = players;
+    updatedRoles[index] = update;
+    setplayers(updatedRoles);
   };
 
   const limitTimeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -30,7 +31,45 @@ const LobbySetting: React.FC = () => {
   };
 
   const back = () => {};
-
+  type player = {
+    id: string;
+    name: string;
+    role: "POLICE" | "THIEF";
+    isCaptured: boolean;
+  };
+  useWebSocket(
+    //websocket開始
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
+      try {
+        const player: player[] = data.players;
+        setLimitTime(data.room.durationSeconds);
+        setplayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else {
+          alert("通信エラー");
+          console.log(data);
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -76,16 +115,21 @@ const LobbySetting: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
+            {players.map((player, index) => (
               <li key={index}>
-                {item}
+                {player.name}-{player.role}
                 <select
-                  value={roles[index]}
-                  onChange={(e) => handleRoleChange(index, e.target.value)}
+                  value={players[index].role}
+                  onChange={(e) =>
+                    handleRoleChange(
+                      index,
+                      e.target.value as "POLICE" | "THIEF"
+                    )
+                  }
                   className="role-select"
                 >
-                  <option value="警察">警察</option>
-                  <option value="泥棒">泥棒</option>
+                  <option value="POLICE">警察</option>
+                  <option value="THIEF">泥棒</option>
                 </select>
               </li>
             ))}
