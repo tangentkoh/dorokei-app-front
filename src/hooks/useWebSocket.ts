@@ -22,7 +22,7 @@ type timer = {
   elapsedSeconds: number; // 経過秒数
   totalSeconds: number; // 合計秒数
   isGracePeriod: boolean; // 猶予時間中か
-  gracePeriodRemaining?: number; // 猶予時間の残り（猶予時間中のみ）
+  gracePeriodRemaining: number; // 猶予時間の残り（猶予時間中のみ）
 };
 type terminate = {
   reason: "TIME_UP" | "ALL_CAPTURED" | "TERMINATED_BY_HOST"; // 'TIME_UP' | 'ALL_CAPTURED' | 'TERMINATED_BY_HOST'

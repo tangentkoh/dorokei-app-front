@@ -17,7 +17,7 @@ interface Props {
 }
 
 const GamePreStart: React.FC<Props> = () => {
-  const [remaining, setRemaining] = useState(60);
+  const [gracePeriodRemaining, setgracePeriodRemaining] = useState<number>(60);
   const [players] = useState<Player[]>([
     { id: "p1", name: "自分", role: "THIEF" },
     { id: "p2", name: "田中", role: "THIEF" },
@@ -26,14 +26,30 @@ const GamePreStart: React.FC<Props> = () => {
 
   useWebSocket(
     //websocket開始
-    "localhost:3001/websocket",
-    (data: string) => {
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
       try {
-        const parsed = JSON.parse(data);
-        if (parsed.type === "timerTick") {
-          setRemaining(parsed.gracePeriodRemaining); //残り時間を更新(?はなにか)
+        alert("通信エラー");
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        setgracePeriodRemaining(data.gracePeriodRemaining);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
         } else {
-          console.log("通信エラー");
+          alert("通信エラー");
+          console.log(data);
         }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
@@ -43,7 +59,7 @@ const GamePreStart: React.FC<Props> = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setRemaining((r) => (r > 0 ? r - 1 : 0));
+      setgracePeriodRemaining((r) => (r > 0 ? r - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -51,7 +67,7 @@ const GamePreStart: React.FC<Props> = () => {
   return (
     <div className="text-center">
       <h2 className="text-xl font-bold mb-3">逃走準備中</h2>
-      <p className="text-lg mb-4">残り時間：{remaining} 秒</p>
+      <p className="text-lg mb-4">残り時間：{gracePeriodRemaining} 秒</p>
 
       <ul className="border rounded p-2 text-left">
         {players.map((p) => (
