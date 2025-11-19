@@ -1,38 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
 import "./LobbyHost.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
-interface LobbyHostProps {
-  playerToken: string;
-  passcode: string;
-  goToTitle: () => void;
-}
+const LobbyHost: React.FC = () => {
+  const [limitTime, setLimitTime] = useState<number>(0);
+  const [police, setPoloce] = useState<number>(0);
+  const [thief, setThief] = useState<number>(0);
 
-// Propsの型を適用
-const LobbyHost: React.FC<LobbyHostProps> = ({
-  playerToken,
-  passcode,
-  goToTitle,
-}) => {
-  // ダミーデータ
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -泥棒`);
-  const limitTime: number = 100;
-  const police: number = 1;
-  const thief: number = 2;
+  const disbandRoom = () => {};
+  const changeRules = () => {};
+  const shutRoom = async (): Promise<void> => {};
 
-  // 部屋解散ボタンはタイトルに戻るロジックに一時的に置き換え
-  const disbandRoom = () => {
-    // 実際にはAPI: POST /rooms/terminate を呼び出す
-    if (window.confirm("部屋を解散しますか？")) {
-      goToTitle(); // App.tsxで認証情報がリセットされる
+  type player = {
+    id: string;
+    name: string;
+    role: "POLICE" | "THIEF";
+    isCaptured: boolean;
+  };
+  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+
+  useWebSocket(
+    //websocket開始
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
+      try {
+        const player: player[] = data.players;
+        setLimitTime(data.room.durationSeconds);
+        setThief(player.filter((player) => player.role === "THIEF").length);
+        setPoloce(player.filter((player) => player.role === "POLICE").length);
+        setplayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else {
+          alert("通信エラー");
+          console.log(data);
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
     }
-  };
-  const changeRules = () => {
-    /* 設定画面へ遷移 */
-  };
-  const shutRoom = () => {
-    /* API: POST /rooms/close を呼び出す */
-  };
-
+  );
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -50,9 +71,6 @@ const LobbyHost: React.FC<LobbyHostProps> = ({
       <div className="center">
         <div className="text-block">
           <h1>ロビー（親）</h1>
-          <h2>合言葉: {passcode}</h2>
-          {/* 認証情報を表示 */}
-          <p>認証トークン (一部): {playerToken.substring(0, 8)}...</p>
           <p>制限時間 {limitTime} 分</p>
           <p>警察 {police} 人</p>
           <p>泥棒 {thief} 人</p>
@@ -60,8 +78,10 @@ const LobbyHost: React.FC<LobbyHostProps> = ({
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
-              <li key={index}>{item}</li>
+            {players.map((player, index) => (
+              <li key={index}>
+                {player.name} -{player.role}
+              </li>
             ))}
           </ul>
         </div>
@@ -69,5 +89,4 @@ const LobbyHost: React.FC<LobbyHostProps> = ({
     </div>
   );
 };
-
 export default LobbyHost;
