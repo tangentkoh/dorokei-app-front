@@ -1,15 +1,71 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./LobbyHostShut.css";
+import { useWebSocket } from "./hooks/useWebSocket";
+import { getRoomStatus } from "./api";
+import { startGame } from "./api";
 
 const LobbyHostShut: React.FC = () => {
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -泥棒`);
-  const limitTime: number = 100;
-  const police: number = 1;
-  const thief: number = 2;
+  const [limitTime, setLimitTime] = useState<number>(0);
+  const [police, setPoloce] = useState<number>(0);
+  const [thief, setThief] = useState<number>(0);
 
   const disbandRoom = () => {};
   const changeRules = () => {};
-  const start = () => {};
+  const start = () => {
+    startGame(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? ""
+    );
+  };
+
+  type player = {
+    id: string;
+    name: string;
+    role: "POLICE" | "THIEF";
+    isCaptured: boolean;
+  };
+  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+
+  useEffect(() => {
+    getRoomStatus(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? ""
+    );
+  }, []);
+
+  useWebSocket(
+    //websocket開始
+    "localhost:3001/websocket",
+    (data: string) => {
+      try {
+        const parsed = JSON.parse(data); //オブジェクト化して、イベントで処理を分岐
+        switch (parsed.type) {
+          case "statusUpdated": //updatedイベントの処理
+            const parsed_player: player[] = JSON.parse(data).players;
+            setLimitTime(parsed.durationSeconds / 60);
+            setThief(
+              parsed_player.filter((player) => player.role === "THIEF").length
+            );
+            setPoloce(
+              parsed_player.filter((player) => player.role === "POLICE").length
+            );
+            setplayers(parsed_player);
+            break;
+          case "terminatedNotification": //terminatedイベントの処理
+            if (parsed.reason === "TERMINATED_BY_HOST") {
+              alert(parsed.message);
+              console.log(parsed.timestamp);
+            } else {
+              alert("通信エラー");
+              console.log(parsed);
+            }
+            break;
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
 
   return (
     <div className="container">
@@ -35,8 +91,10 @@ const LobbyHostShut: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
-              <li key={index}>{item}</li>
+            {players.map((player, index) => (
+              <li key={index}>
+                {player.name}-{player.role}
+              </li>
             ))}
           </ul>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./InGame.css";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 interface Player {
   id: string;
@@ -17,7 +18,7 @@ interface Props {
 }
 
 const InGame: React.FC<Props> = ({
-  currentPlayerId = "p1",  // デフォルト値
+  currentPlayerId = "p1", // デフォルト値
 }) => {
   const [remaining, setRemaining] = useState(300);
   const [players, setPlayers] = useState<Player[]>([
@@ -44,6 +45,26 @@ const InGame: React.FC<Props> = ({
   };
 
   const capturedList = players.filter((p) => p.isCaptured);
+
+  useWebSocket(
+    //websocket開始
+    "localhost:3001/websocket",
+    (data: string) => {
+      try {
+        switch (JSON.parse(data).type) {
+          case "timerTick":
+            setRemaining(JSON.parse(data).remainingSeconds);
+            break;
+          case "playerStatusUpdated":
+            const parsed_player: Player[] = JSON.parse(data).players;
+            setPlayers(parsed_player);
+            break;
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
 
   return (
     <div className="text-center">

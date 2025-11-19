@@ -1,15 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./LobbySetting.css";
+import { getRoomStatus } from "./api";
+import { updateRoomSettings } from "./api";
+import type { PlayerRole } from "./api";
 
 const LobbySetting: React.FC = () => {
-  const items = Array.from({ length: 10 }, (_, i) => `名前 ${i + 1} -`);
-  const [roles, setRoles] = useState<string[]>(Array(10).fill("泥棒"));
+  const [players, setPlayers] = useState<Array<{ id: string; name: string }>>(
+    []
+  );
+  const [roles, setRoles] = useState<string[]>([]);
 
   const [limitTime, setLimitTime] = useState(100);
   const [police, setPolice] = useState(1);
   const [thief, setThief] = useState(2);
 
+  const buildSettings = (): {
+    roles: { playerId: string; role: PlayerRole }[];
+    gracePeriodSeconds: number;
+    durationSeconds: number;
+  } => ({
+    roles: players.map((player, index) => ({
+      playerId: player.id,
+      role: roles[index] === "警察" ? "POLICE" : "THIEF",
+    })),
+    gracePeriodSeconds: 10,
+    durationSeconds: limitTime,
+  });
   const handleRoleChange = (index: number, value: string) => {
     const updatedRoles = [...roles];
     updatedRoles[index] = value;
@@ -18,19 +35,45 @@ const LobbySetting: React.FC = () => {
 
   const limitTimeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = Number(e.target.value);
+    updateRoomSettings(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? "",
+      buildSettings()
+    );
     setLimitTime(value);
   };
   const policeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = Number(e.target.value);
+    updateRoomSettings(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? "",
+      buildSettings()
+    );
     setPolice(value);
   };
   const thiefChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const value = Number(e.target.value);
+    updateRoomSettings(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? "",
+      buildSettings()
+    );
     setThief(value);
   };
 
   const back = () => {};
 
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const res = await getRoomStatus(
+        localStorage.getItem("playerToken") ?? "",
+        localStorage.getItem("passcode") ?? ""
+      );
+      setPlayers(res.players);
+      setRoles(res.players.map(() => "泥棒")); // 初期化
+    };
+    fetchStatus();
+  }, []);
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -76,9 +119,9 @@ const LobbySetting: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {items.map((item, index) => (
-              <li key={index}>
-                {item}
+            {players.map((player, index) => (
+              <li key={player.id}>
+                {player.name}
                 <select
                   value={roles[index]}
                   onChange={(e) => handleRoleChange(index, e.target.value)}

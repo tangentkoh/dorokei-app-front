@@ -35,3 +35,9 @@
   background-color: #ffaea5;
   cursor: pointer;
 }
+
+.error-message {
+  color: red; /* テキストを赤色にするスタイル */
+  font-size: small; /* 必要に応じてサイズ調整 */
+  margin-top: 5px;
+}
