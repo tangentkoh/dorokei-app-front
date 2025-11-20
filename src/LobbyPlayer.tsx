@@ -84,9 +84,9 @@ const LobbyPlayer: React.FC = () => {
 
         <div className="list-container">
           <ul>
-            {players.map((players, index) => (
+            {players.map((player, index) => (
               <li key={index}>
-                {players.name}-{players.role}
+                {player.name} -{player.role === "THIEF" ? "泥棒" : "警察"}
               </li>
             ))}
           </ul>

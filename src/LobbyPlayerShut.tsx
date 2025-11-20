@@ -84,7 +84,7 @@ const LobbyPlayerShut: React.FC = () => {
           <ul>
             {players.map((player, index) => (
               <li key={index}>
-                {player.name}-{player.role}
+                {player.name} -{player.role === "THIEF" ? "泥棒" : "警察"}
               </li>
             ))}
           </ul>

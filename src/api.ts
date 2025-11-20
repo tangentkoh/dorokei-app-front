@@ -6,7 +6,8 @@
 
 // 環境変数が設定されていない場合、開発用のデフォルトURLを使用
 const API_BASE_URL: string =
-  (import.meta.env.VITE_API_URL as string) || "http://localhost:3001";
+  (import.meta.env.VITE_API_URL as string) ||
+  "https://dorokei-app-back.onrender.com/";
 
 // API仕様書から取得
 export type PlayerRole = "POLICE" | "THIEF"; // [cite: 23]
