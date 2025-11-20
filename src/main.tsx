@@ -5,10 +5,10 @@ import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
-  Outlet,
-  Navigate,
+  //Outlet, //この辺りは一旦無効にします
+  //Navigate,
   redirect,
-  useLoaderData,
+  //useLoaderData,
 } from "react-router-dom";
 
 import "./main.css";
@@ -32,6 +32,9 @@ import InGame from "./InGame";
 const PLAYER_NAME_KEY = "cadro_player_name";
 const PLAYER_TOKEN_KEY = "playerToken";
 const PASSCODE_KEY = "passcode";
+
+const API_BASE_URL = "http://localhost:3001";
+const SOCKET_URL = "https://dorokei-app-back.onrender.com/";
 
 // ----------------------------------------------------
 // 認証ガード (Loader Functions)
@@ -64,7 +67,13 @@ const authGuardLoader = () => {
   }
 
   // 必要な情報をオブジェクトとして返す
-  return { playerToken, passcode, playerName };
+  return {
+    playerToken,
+    passcode,
+    playerName,
+    apiBaseUrl: API_BASE_URL, // URLを追加
+    socketUrl: SOCKET_URL, // URLを追加
+  };
 };
 
 // ----------------------------------------------------
@@ -126,7 +135,14 @@ const router = createBrowserRouter([
       { path: "/disband", element: <Disband />, loader: authGuardLoader },
       {
         path: "/game/prestart",
-        element: <GamePreStart />,
+        element: (
+          <GamePreStart
+            playerToken={""}
+            passcode={""}
+            apiBaseUrl={""}
+            socketUrl={""}
+          />
+        ),
         loader: authGuardLoader,
       },
       { path: "/game/ingame", element: <InGame />, loader: authGuardLoader },
@@ -142,17 +158,17 @@ createRoot(document.getElementById("root")!).render(
 );
 
 // ダミーコンポーネントの定義 (エラー回避のため)
-const LobbySetting = () => (
-  <div className="debug-info">Lobby Setting (WIP)</div>
-);
-const LobbyHostShut = () => (
-  <div className="debug-info">Lobby Host Shut (WIP)</div>
-);
-const LobbyPlayerShut = () => (
-  <div className="debug-info">Lobby Player Shut (WIP)</div>
-);
-const Disband = () => <div className="debug-info">Disband (WIP)</div>;
-const GamePreStart = () => (
-  <div className="debug-info">Game Pre Start (WIP)</div>
-);
-const InGame = () => <div className="debug-info">In Game (WIP)</div>;
+//const LobbySetting = () => (
+//  <div className="debug-info">Lobby Setting (WIP)</div>
+//);
+//const LobbyHostShut = () => (
+//  <div className="debug-info">Lobby Host Shut (WIP)</div>
+//);
+//const LobbyPlayerShut = () => (
+//  <div className="debug-info">Lobby Player Shut (WIP)</div>
+//);
+//const Disband = () => <div className="debug-info">Disband (WIP)</div>;
+//const GamePreStart = () => (
+//  <div className="debug-info">Game Pre Start (WIP)</div>
+//);
+//const InGame = () => <div className="debug-info">In Game (WIP)</div>;
