@@ -12,7 +12,7 @@ const LobbyPlayer: React.FC = () => {
   const navigate = useNavigate();
 
   const escapeRoom = () => {
-    navigate("/title");
+    navigate("/");
   };
 
   type player = {

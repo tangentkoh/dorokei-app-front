@@ -13,17 +13,17 @@ const LobbyHostShut: React.FC = () => {
   const navigate = useNavigate();
 
   const disbandRoom = () => {
-    navigate("/title");
+    navigate("/");
   };
   const changeRules = () => {
-    navigate("/lobby/setting", { state: { from: "/lobby/host/shut" } });
+    navigate("/lobby/settings", { state: { from: "/lobby/host/shut" } });
   };
   const start = () => {
     startGame(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
-    navigate("/game/pre/start");
+    navigate("/game/prestart");
   };
 
   type player = {
