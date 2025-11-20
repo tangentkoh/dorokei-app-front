@@ -3,19 +3,27 @@ import "./LobbyHostShut.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
 import { startGame } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyHostShut: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
   const [police, setPoloce] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
-  const disbandRoom = () => {};
-  const changeRules = () => {};
+  const navigate = useNavigate();
+
+  const disbandRoom = () => {
+    navigate("/");
+  };
+  const changeRules = () => {
+    navigate("/lobby/settings", { state: { from: "/lobby/host/shut" } });
+  };
   const start = () => {
     startGame(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
+    navigate("/game/prestart");
   };
 
   type player = {

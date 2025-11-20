@@ -3,19 +3,27 @@ import "./LobbyHost.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
 import { closeRoom } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyHost: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
-  const [police, setPoloce] = useState<number>(0);
+  const [police, setPolice] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
-  const disbandRoom = () => {};
-  const changeRules = () => {};
+  const navigate = useNavigate();
+
+  const disbandRoom = () => {
+    navigate("/");
+  };
+  const changeRules = () => {
+    navigate("/lobby/settings", { state: { from: "/lobby/host" } });
+  };
   const shutRoom = async (): Promise<void> => {
     closeRoom(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
+    navigate("/lobby/host/shut");
   };
 
   type player = {
@@ -25,12 +33,6 @@ const LobbyHost: React.FC = () => {
     isCaptured: boolean;
   };
 
-  useEffect(() => {
-    getRoomStatus(
-      localStorage.getItem("playerToken") ?? "",
-      localStorage.getItem("passcode") ?? ""
-    );
-  }, []);
   //{ id: "player-1", name: "名前 1", role: "THIEF", isCaptured: false },
   const [players, setPlayers] = useState<player[]>([]);
 
@@ -49,7 +51,7 @@ const LobbyHost: React.FC = () => {
         const player: player[] = data.players;
         setLimitTime(data.room.durationSeconds);
         setThief(player.filter((player) => player.role === "THIEF").length);
-        setPoloce(player.filter((player) => player.role === "POLICE").length);
+        setPolice(player.filter((player) => player.role === "POLICE").length);
         setPlayers(player);
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);

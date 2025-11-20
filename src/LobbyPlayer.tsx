@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import "./LobbyPlayer.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyPlayer: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
   const [police, setPoloce] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
-  const escapeRoom = () => {};
+  const navigate = useNavigate();
+
+  const escapeRoom = () => {
+    navigate("/");
+  };
 
   type player = {
     id: string;
