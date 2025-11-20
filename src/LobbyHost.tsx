@@ -31,19 +31,8 @@ const LobbyHost: React.FC = () => {
       localStorage.getItem("passcode") ?? ""
     );
   }, []);
-  //const [players, setPlayers] = useState<player[]>([]); //playerName,roleの配列定義
-  const [players, setPlayers] = useState<player[]>([
-    { id: "player-1", name: "名前 1", role: "THIEF", isCaptured: false },
-    { id: "player-2", name: "名前 2", role: "THIEF", isCaptured: false },
-    { id: "player-3", name: "名前 3", role: "THIEF", isCaptured: false },
-    { id: "player-4", name: "名前 4", role: "THIEF", isCaptured: false },
-    { id: "player-5", name: "名前 5", role: "THIEF", isCaptured: false },
-    { id: "player-6", name: "名前 6", role: "THIEF", isCaptured: false },
-    { id: "player-7", name: "名前 7", role: "THIEF", isCaptured: false },
-    { id: "player-8", name: "名前 8", role: "THIEF", isCaptured: false },
-    { id: "player-9", name: "名前 9", role: "THIEF", isCaptured: false },
-    { id: "player-10", name: "名前 10", role: "THIEF", isCaptured: false },
-  ]);
+  //{ id: "player-1", name: "名前 1", role: "THIEF", isCaptured: false },
+  const [players, setPlayers] = useState<player[]>([]);
 
   useWebSocket(
     //websocket開始
