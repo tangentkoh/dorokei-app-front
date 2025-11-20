@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./LobbyHost.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { getRoomStatus } from "./api";
+import { closeRoom } from "./api";
 
 const LobbyHost: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
@@ -9,7 +11,12 @@ const LobbyHost: React.FC = () => {
 
   const disbandRoom = () => {};
   const changeRules = () => {};
-  const shutRoom = async (): Promise<void> => {};
+  const shutRoom = async (): Promise<void> => {
+    closeRoom(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? ""
+    );
+  };
 
   type player = {
     id: string;
@@ -17,7 +24,26 @@ const LobbyHost: React.FC = () => {
     role: "POLICE" | "THIEF";
     isCaptured: boolean;
   };
-  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+
+  useEffect(() => {
+    getRoomStatus(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? ""
+    );
+  }, []);
+  //const [players, setPlayers] = useState<player[]>([]); //playerName,roleの配列定義
+  const [players, setPlayers] = useState<player[]>([
+    { id: "player-1", name: "名前 1", role: "THIEF", isCaptured: false },
+    { id: "player-2", name: "名前 2", role: "THIEF", isCaptured: false },
+    { id: "player-3", name: "名前 3", role: "THIEF", isCaptured: false },
+    { id: "player-4", name: "名前 4", role: "THIEF", isCaptured: false },
+    { id: "player-5", name: "名前 5", role: "THIEF", isCaptured: false },
+    { id: "player-6", name: "名前 6", role: "THIEF", isCaptured: false },
+    { id: "player-7", name: "名前 7", role: "THIEF", isCaptured: false },
+    { id: "player-8", name: "名前 8", role: "THIEF", isCaptured: false },
+    { id: "player-9", name: "名前 9", role: "THIEF", isCaptured: false },
+    { id: "player-10", name: "名前 10", role: "THIEF", isCaptured: false },
+  ]);
 
   useWebSocket(
     //websocket開始
@@ -28,7 +54,7 @@ const LobbyHost: React.FC = () => {
         setLimitTime(data.room.durationSeconds);
         setThief(player.filter((player) => player.role === "THIEF").length);
         setPoloce(player.filter((player) => player.role === "POLICE").length);
-        setplayers(player);
+        setPlayers(player);
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }
@@ -80,7 +106,7 @@ const LobbyHost: React.FC = () => {
           <ul>
             {players.map((player, index) => (
               <li key={index}>
-                {player.name} -{player.role}
+                {player.name} -{player.role === "THIEF" ? "泥棒" : "警察"}
               </li>
             ))}
           </ul>
