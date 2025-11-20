@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./InGame.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { useNavigate } from "react-router-dom";
 
 interface Player {
   id: string;
@@ -53,6 +54,11 @@ const InGame: React.FC<Props> = ({
       try {
         const player: Player[] = data.players;
         setPlayers(player);
+        const navigate = useNavigate();
+        if (data.room.status === "CLOSED" || data.room.status === "WAITING") {
+          //締め切り画面へ遷移
+          navigate("/lobby/host");
+        }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./GamePreStart.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { useNavigate } from "react-router-dom";
 
 interface Player {
   id: string;
@@ -16,7 +17,7 @@ interface Props {
   currentPlayerId?: string;
 }
 
-const GamePreStart: React.FC<Props> = () => {
+const GamePreStart: React.FC = () => {
   const [gracePeriodRemaining, setgracePeriodRemaining] = useState<number>(60);
   const [players] = useState<Player[]>([
     { id: "p1", name: "自分", role: "THIEF" },
@@ -31,6 +32,14 @@ const GamePreStart: React.FC<Props> = () => {
       try {
         alert("通信エラー");
         console.log(data);
+        const navigate = useNavigate();
+        if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
+          //ゲーム開始画面へ遷移
+          navigate("/game/ingame");
+        } else if (data.room.status === "WAITING") {
+          //締め切り画面へ遷移
+          navigate("/lobby/host");
+        }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }
@@ -56,13 +65,6 @@ const GamePreStart: React.FC<Props> = () => {
       }
     }
   );
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setgracePeriodRemaining((r) => (r > 0 ? r - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="text-center">

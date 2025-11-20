@@ -4,6 +4,7 @@ import "./LobbySetting.css";
 import { getRoomStatus } from "./api";
 import { updateRoomSettings } from "./api";
 import type { PlayerRole } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbySetting: React.FC = () => {
   const [players, setPlayers] = useState<Array<{ id: string; name: string }>>(
@@ -102,6 +103,11 @@ const LobbySetting: React.FC = () => {
             return p.role === "POLICE" ? "警察" : "泥棒";
           })
         ); // 役割情報をstateにセット);
+        const navigate = useNavigate();
+        if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
+          //ゲーム開始画面へ遷移
+          navigate("/game/ingame");
+        }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }

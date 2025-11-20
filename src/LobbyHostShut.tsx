@@ -3,6 +3,7 @@ import "./LobbyHostShut.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
 import { startGame } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyHostShut: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
@@ -27,7 +28,7 @@ const LobbyHostShut: React.FC = () => {
   const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
 
   useEffect(() => {
-    getRoomStatus(
+    const data = getRoomStatus(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
@@ -43,6 +44,14 @@ const LobbyHostShut: React.FC = () => {
         setThief(player.filter((player) => player.role === "THIEF").length);
         setPoloce(player.filter((player) => player.role === "POLICE").length);
         setplayers(player);
+        const navigate = useNavigate();
+        if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
+          //ゲーム開始画面へ遷移
+          navigate("/game/ingame");
+        } else if (data.room.status === "WAITING") {
+          //締め切り画面へ遷移
+          navigate("/lobby/host");
+        }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }
