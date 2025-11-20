@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./LobbyPlayerShut.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { getRoomStatus } from "./api";
 
 const LobbyPlayerShut: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
@@ -14,6 +15,13 @@ const LobbyPlayerShut: React.FC = () => {
     isCaptured: boolean;
   };
   const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+
+  useEffect(() => {
+    getRoomStatus(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? ""
+    );
+  }, []);
 
   useWebSocket(
     //websocket開始
