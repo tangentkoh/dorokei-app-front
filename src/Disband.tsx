@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const Disband: React.FC = () => {
   const navigate = useNavigate();
   const goTitle = () => {
-    navigate("/title");
+    navigate("/");
   };
 
   return (
