@@ -1,35 +1,32 @@
-let socket: WebSocket | null = null;
-const getPlayerToken = (): string | null => {
-  const value = document.cookie
-    .split(/;\s*/)
-    .find((row) => row.startsWith("playerToken="))
-    ?.split("=")[1];
-  return value ? decodeURIComponent(value) : null;
-};
+import { io, Socket } from "socket.io-client";
 
-export const connectionWebsocket = (url: string): WebSocket => {
-  socket = new WebSocket(url);
+let socket: Socket | null = null;
 
-  socket.onopen = () => {
-    if (socket && getPlayerToken()) {
-      socket.send(
-        JSON.stringify({
-          playerToken: getPlayerToken(),
-        })
-      );
+export const connectionWebsocket = (url: string): Socket => {
+  socket = io(url, {
+    autoConnect: false, // 手動で connect() する
+    transports: ["websocket"], // 純粋な WebSocket に近い動作
+  });
+
+  socket.on("connect", () => {
+    const token = localStorage.getItem("playerToken");
+    if (token) {
+      socket?.emit("auth", { playerToken: token }); // サーバー側で "auth" を受ける
     } else {
       console.error("No player token found in cookies.");
     }
-    console.log("Websocket connected");
-  };
+    console.log("Socket.IO connected");
+  });
 
-  socket.onclose = () => {
-    console.log("Websocket disconnected");
-  };
+  socket.on("disconnect", () => {
+    console.log("Socket.IO disconnected");
+  });
 
-  socket.onerror = (error) => {
-    console.error("Websocket error:", error);
-  };
+  socket.on("connect_error", (error) => {
+    console.error("Socket.IO error:", error);
+  });
+
+  socket.connect(); // 明示的に接続する（autoConnect:false のため）
 
   return socket;
 };

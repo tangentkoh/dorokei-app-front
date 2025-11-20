@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import "./LobbyPlayerShut.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyPlayerShut: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
   const [police, setPoloce] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
+
+  const navigate = useNavigate();
 
   type player = {
     id: string;
@@ -25,31 +28,33 @@ const LobbyPlayerShut: React.FC = () => {
 
   useWebSocket(
     //websocket開始
-    "localhost:3001/websocket",
-    (data: string) => {
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
       try {
-        const parsed = JSON.parse(data); //オブジェクト化して、イベントで処理を分岐
-        switch (parsed.type) {
-          case "statusUpdated": //updatedイベントの処理
-            const parsed_player: player[] = JSON.parse(data).players;
-            setLimitTime(parsed.durationSeconds / 60);
-            setThief(
-              parsed_player.filter((player) => player.role === "THIEF").length
-            );
-            setPoloce(
-              parsed_player.filter((player) => player.role === "POLICE").length
-            );
-            setplayers(parsed_player);
-            break;
-          case "terminatedNotification": //terminatedイベントの処理
-            if (parsed.reason === "TERMINATED_BY_HOST") {
-              alert(parsed.message);
-              console.log(parsed.timestamp);
-            } else {
-              alert("通信エラー");
-              console.log(parsed);
-            }
-            break;
+        const player: player[] = data.players;
+        setLimitTime(data.room.durationSeconds);
+        setThief(player.filter((player) => player.role === "THIEF").length);
+        setPoloce(player.filter((player) => player.role === "POLICE").length);
+        setplayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else {
+          alert("通信エラー");
+          console.log(data);
         }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
@@ -82,7 +87,7 @@ const LobbyPlayerShut: React.FC = () => {
           <ul>
             {players.map((player, index) => (
               <li key={index}>
-                {player.name}-{player.role}
+                {player.name} -{player.role === "THIEF" ? "泥棒" : "警察"}
               </li>
             ))}
           </ul>

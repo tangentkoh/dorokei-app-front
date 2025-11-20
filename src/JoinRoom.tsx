@@ -1,26 +1,26 @@
-// JoinRoom.tsx
 import React, { useState } from "react";
+import { useNavigate, useLoaderData } from "react-router-dom"; // 🚨 useNavigate, useLoaderDataをインポート
 import "./JoinRoom.css";
-// API連携のためにインポート
-import { joinRoom, type RoomResponse } from "./api";
+import { joinRoom, type RoomResponse } from "./api"; // joinRoomをインポート
 
-interface JoinRoomProps {
-  playerName: string;
-  goToTitle: () => void;
-  // goToLobbyPlayer は削除
-}
+// 認証情報のキーを定義 (main.tsxと同期)
+const PLAYER_TOKEN_KEY = "playerToken";
+const PASSCODE_KEY = "passcode";
 
-const JoinRoom: React.FC<JoinRoomProps> = ({ playerName, goToTitle }) => {
+// 以前のProps定義は削除
+
+const JoinRoom: React.FC = () => {
+  // 🚨 1. loaderからplayerNameを取得 (playerNameはstring型として保証されている)
+  const playerName = useLoaderData() as string;
+  const navigate = useNavigate();
+
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // 成功メッセージの状態を追加
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // 部屋への参加処理
   const handleJoinRoom = async () => {
     setError(null);
-    setSuccessMessage(null); // 毎回リセット
 
     // バリデーション
     if (passcode.length < 6) {
@@ -34,32 +34,34 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ playerName, goToTitle }) => {
       // API呼び出し
       const roomData: RoomResponse = await joinRoom(playerName, passcode);
 
-      // 成功時: 遷移せず、成功メッセージを表示
-      const playerIdSnippet =
-        roomData.playerld?.substring(0, 8) || "ID取得エラー";
+      // 成功時処理: 認証情報を保存し、LobbyPlayerへ遷移
 
-      setSuccessMessage(
-        `部屋作成成功！合言葉: ${roomData.passcode} (Player ID: ${playerIdSnippet}...)`
-      );
+      // 1. playerTokenとpasscodeをローカルストレージに保存
+      localStorage.setItem(PLAYER_TOKEN_KEY, roomData.playerToken);
+      localStorage.setItem(PASSCODE_KEY, roomData.passcode);
+
+      // 2. /lobby/player ルートへ遷移
+      navigate("/lobby/player");
     } catch (e) {
       // エラー時
       const errorMessage =
         e instanceof Error
           ? e.message
-          : "部屋への入場に失敗しました。合言葉を確認し再入力してください。";
+          : "部屋参加に失敗しました。合言葉が正しいか確認してください。";
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Title画面に戻る処理
+   */
   const goTitle = () => {
-    goToTitle();
+    navigate("/");
   };
 
-  // 成功したらボタンを無効化
-  const isButtonDisabled =
-    passcode.length < 6 || loading || successMessage !== null;
+  const isButtonDisabled = passcode.length < 6 || loading;
 
   return (
     <div className="center-wrapper">
@@ -72,17 +74,15 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ playerName, goToTitle }) => {
         className="select-Button"
         type="text"
         value={passcode}
-        placeholder="部屋の合言葉 (6文字以上)"
+        placeholder="部屋の合言葉"
         onChange={(e) => setPasscode(e.target.value)}
       ></input>
       <h1> </h1>
       <h1 className="read-text">合言葉「{passcode}」でよろしいですね？</h1>
       <h2> </h2>
 
-      {/* 成功/エラーメッセージの表示 */}
-      {successMessage && <p className="success-message">{successMessage}</p>}
       {error && <p className="error-message">エラー: {error}</p>}
-      {loading && <p>部屋に入場中...</p>}
+      {loading && <p>部屋に参加中...</p>}
 
       <button
         className="select-button"
@@ -91,12 +91,6 @@ const JoinRoom: React.FC<JoinRoomProps> = ({ playerName, goToTitle }) => {
       >
         {loading ? "処理中" : "入場"}
       </button>
-
-      {successMessage && (
-        <button className="select-button" onClick={goTitle}>
-          タイトルへ戻る
-        </button>
-      )}
     </div>
   );
 };

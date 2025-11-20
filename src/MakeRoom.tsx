@@ -1,26 +1,24 @@
-// MakeRoom.tsx
 import React, { useState } from "react";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import "./MakeRoom.css";
-// API連携のためにインポート
 import { createRoom, type RoomResponse } from "./api";
 
-interface MakeRoomProps {
-  playerName: string;
-  goToTitle: () => void;
-  // goToLobbyHost は削除
-}
+// 認証情報のキーを定義 (main.tsxと同期)
+const PLAYER_TOKEN_KEY = "playerToken";
+const PASSCODE_KEY = "passcode";
 
-const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
+const MakeRoom: React.FC = () => {
+  // 1. loaderからplayerNameを取得 (playerNameはstring型として保証されている)
+  const playerName = useLoaderData() as string;
+  const navigate = useNavigate();
+
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // 成功メッセージの状態を追加
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // 部屋の作成処理
   const handleCreateRoom = async () => {
     setError(null);
-    setSuccessMessage(null); // 毎回リセット
 
     // バリデーション
     if (passcode.length < 6) {
@@ -34,13 +32,12 @@ const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
       // API呼び出し
       const roomData: RoomResponse = await createRoom(playerName, passcode);
 
-      // 成功時: 遷移せず、成功メッセージを表示
-      const playerIdSnippet =
-        roomData.playerId?.substring(0, 8) || "ID取得エラー";
+      // 1. playerTokenとpasscodeをローカルストレージに保存
+      localStorage.setItem(PLAYER_TOKEN_KEY, roomData.playerToken);
+      localStorage.setItem(PASSCODE_KEY, roomData.passcode);
 
-      setSuccessMessage(
-        `部屋作成成功！合言葉: ${roomData.passcode} (Player ID: ${playerIdSnippet}...)`
-      );
+      // 2. /lobby/host ルートへ遷移
+      navigate("/lobby/host");
     } catch (e) {
       // エラー時
       const errorMessage =
@@ -54,12 +51,10 @@ const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
   };
 
   const goTitle = () => {
-    goToTitle();
+    navigate("/");
   };
 
-  // 成功したらボタンを無効化
-  const isButtonDisabled =
-    passcode.length < 6 || loading || successMessage !== null;
+  const isButtonDisabled = passcode.length < 6 || loading;
 
   return (
     <div className="center-wrapper">
@@ -79,8 +74,6 @@ const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
       <h1 className="read-text">合言葉「{passcode}」でよろしいですね？</h1>
       <h2> </h2>
 
-      {/* 成功/エラーメッセージの表示 */}
-      {successMessage && <p className="success-message">{successMessage}</p>}
       {error && <p className="error-message">エラー: {error}</p>}
       {loading && <p>部屋を作成中...</p>}
 
@@ -91,12 +84,6 @@ const MakeRoom: React.FC<MakeRoomProps> = ({ playerName, goToTitle }) => {
       >
         {loading ? "処理中" : "作成"}
       </button>
-
-      {successMessage && (
-        <button className="select-button" onClick={goTitle}>
-          タイトルへ戻る
-        </button>
-      )}
     </div>
   );
 };

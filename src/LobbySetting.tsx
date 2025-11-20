@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
-
+import { useWebSocket } from "./hooks/useWebSocket";
 import "./LobbySetting.css";
 import { getRoomStatus } from "./api";
 import { updateRoomSettings } from "./api";
 import type { PlayerRole } from "./api";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LobbySetting: React.FC = () => {
   const [players, setPlayers] = useState<Array<{ id: string; name: string }>>(
     []
   );
   const [roles, setRoles] = useState<string[]>([]);
-
   const [limitTime, setLimitTime] = useState(100);
   const [police, setPolice] = useState(1);
   const [thief, setThief] = useState(2);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from;
 
   const buildSettings = (): {
     roles: { playerId: string; role: PlayerRole }[];
@@ -31,6 +35,11 @@ const LobbySetting: React.FC = () => {
     const updatedRoles = [...roles];
     updatedRoles[index] = value;
     setRoles(updatedRoles);
+    updateRoomSettings(
+      localStorage.getItem("playerToken") ?? "",
+      localStorage.getItem("passcode") ?? "",
+      buildSettings()
+    );
   };
 
   const limitTimeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -61,7 +70,13 @@ const LobbySetting: React.FC = () => {
     setThief(value);
   };
 
-  const back = () => {};
+  const back = () => {
+    if (from === "/lobby/host") {
+      navigate("/lobby/host");
+    } else if (from === "/lobby/host/shut") {
+      navigate("/lobby/host/shut");
+    }
+  };
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -69,11 +84,61 @@ const LobbySetting: React.FC = () => {
         localStorage.getItem("playerToken") ?? "",
         localStorage.getItem("passcode") ?? ""
       );
-      setPlayers(res.players);
-      setRoles(res.players.map(() => "泥棒")); // 初期化
+      setPlayers(res.players.map(({ id, name }) => ({ id, name }))); // プレイヤー情報をstateにセット);
+      setRoles(
+        res.players.map((player) => {
+          return player.role === "POLICE" ? "警察" : "泥棒";
+        })
+      ); // 初期化
     };
     fetchStatus();
   }, []);
+
+  type player = {
+    id: string;
+    name: string;
+    role: "POLICE" | "THIEF";
+    isCaptured: boolean;
+  };
+  useWebSocket(
+    //websocket開始
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
+      try {
+        const player: player[] = data.players;
+        setLimitTime(data.room.durationSeconds);
+        setPlayers(player.map(({ id, name }) => ({ id, name }))); // プレイヤー情報をstateにセット);
+        setRoles(
+          player.map((p) => {
+            return p.role === "POLICE" ? "警察" : "泥棒";
+          })
+        ); // 役割情報をstateにセット);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        console.log(data);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else {
+          alert("通信エラー");
+          console.log(data);
+        }
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    }
+  );
+
   return (
     <div className="container">
       {/* ボタン配置 */}
@@ -124,11 +189,13 @@ const LobbySetting: React.FC = () => {
                 {player.name}
                 <select
                   value={roles[index]}
-                  onChange={(e) => handleRoleChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleRoleChange(index, e.target.value as "警察" | "泥棒")
+                  }
                   className="role-select"
                 >
-                  <option value="警察">警察</option>
-                  <option value="泥棒">泥棒</option>
+                  <option value="POLICE">警察</option>
+                  <option value="THIEF">泥棒</option>
                 </select>
               </li>
             ))}

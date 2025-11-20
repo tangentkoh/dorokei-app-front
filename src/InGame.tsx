@@ -48,17 +48,36 @@ const InGame: React.FC<Props> = ({
 
   useWebSocket(
     //websocket開始
-    "localhost:3001/websocket",
-    (data: string) => {
+    "https://dorokei-app-back.onrender.com/",
+    (data) => {
       try {
-        switch (JSON.parse(data).type) {
-          case "timerTick":
-            setRemaining(JSON.parse(data).remainingSeconds);
-            break;
-          case "playerStatusUpdated":
-            const parsed_player: Player[] = JSON.parse(data).players;
-            setPlayers(parsed_player);
-            break;
+        const player: Player[] = data.players;
+        setPlayers(player);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        setRemaining(data.remainingSeconds);
+      } catch (e) {
+        console.error("WebSocketデータの解析に失敗", e);
+      }
+    },
+    (data) => {
+      try {
+        if (data.reason === "TERMINATED_BY_HOST") {
+          alert(data.message);
+          console.log(data.timestamp);
+        } else if (data.reason === "TIME_UP") {
+          alert(data.message);
+          console.log(data);
+        } else if (data.reason === "ALL_CAPTURED") {
+          alert(data.message);
+          console.log(data);
+        } else {
+          alert("通信エラー");
+          console.log(data);
         }
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
