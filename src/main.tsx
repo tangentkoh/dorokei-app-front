@@ -1,7 +1,7 @@
 // routerの役割
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// 🚨 React Router の主要なフックとプロバイダをインポート
+// React Router の主要なフックとプロバイダをインポート
 import {
   createBrowserRouter,
   RouterProvider,
@@ -13,7 +13,7 @@ import {
 
 import "./main.css";
 
-// 🚨 各コンポーネントをインポート
+// 各コンポーネントをインポート
 // App.tsx をレイアウトコンポーネントとして使用
 import App from "./App.tsx";
 import Title from "./Title.tsx";
@@ -21,14 +21,12 @@ import MakeRoom from "./MakeRoom.tsx";
 import JoinRoom from "./JoinRoom.tsx";
 import LobbyHost from "./LobbyHost.tsx";
 import LobbyPlayer from "./LobbyPlayer.tsx";
-// 今後の実装に必要なコンポーネントをインポート
 import LobbySetting from "./LobbySetting";
 import LobbyHostShut from "./LobbyHostShut";
 import LobbyPlayerShut from "./LobbyPlayerShut";
 import Disband from "./Disband";
 import GamePreStart from "./GamePreStart";
 import InGame from "./InGame";
-import Result from "./Result";
 
 // 認証情報のキー
 const PLAYER_NAME_KEY = "cadro_player_name";
@@ -132,7 +130,6 @@ const router = createBrowserRouter([
         loader: authGuardLoader,
       },
       { path: "/game/ingame", element: <InGame />, loader: authGuardLoader },
-      { path: "/game/result", element: <Result />, loader: authGuardLoader },
     ],
   },
 ]);
@@ -159,4 +156,3 @@ const GamePreStart = () => (
   <div className="debug-info">Game Pre Start (WIP)</div>
 );
 const InGame = () => <div className="debug-info">In Game (WIP)</div>;
-const Result = () => <div className="debug-info">Result (WIP)</div>;
