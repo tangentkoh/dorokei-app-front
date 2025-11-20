@@ -1,4 +1,4 @@
-// routerの役割
+// routerの役割に変更
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 // React Router の主要なフックとプロバイダをインポート
