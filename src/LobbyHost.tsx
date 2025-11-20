@@ -3,19 +3,27 @@ import "./LobbyHost.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { getRoomStatus } from "./api";
 import { closeRoom } from "./api";
+import { useNavigate } from "react-router-dom";
 
 const LobbyHost: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
   const [police, setPoloce] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
-  const disbandRoom = () => {};
-  const changeRules = () => {};
+  const navigate = useNavigate();
+
+  const disbandRoom = () => {
+    navigate("/title.tsx");
+  };
+  const changeRules = () => {
+    navigate("/lobby/setting", { state: { from: "/lobby/host" } });
+  };
   const shutRoom = async (): Promise<void> => {
     closeRoom(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
+    navigate("/lobby/host/shut");
   };
 
   type player = {

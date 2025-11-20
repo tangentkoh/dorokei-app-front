@@ -4,6 +4,7 @@ import "./LobbySetting.css";
 import { getRoomStatus } from "./api";
 import { updateRoomSettings } from "./api";
 import type { PlayerRole } from "./api";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LobbySetting: React.FC = () => {
   const [players, setPlayers] = useState<Array<{ id: string; name: string }>>(
@@ -13,6 +14,10 @@ const LobbySetting: React.FC = () => {
   const [limitTime, setLimitTime] = useState(100);
   const [police, setPolice] = useState(1);
   const [thief, setThief] = useState(2);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from;
 
   const buildSettings = (): {
     roles: { playerId: string; role: PlayerRole }[];
@@ -65,7 +70,13 @@ const LobbySetting: React.FC = () => {
     setThief(value);
   };
 
-  const back = () => {};
+  const back = () => {
+    if (from === "/lobby/host") {
+      navigate("/lobby/host");
+    } else if (from === "/lobby/host/shut") {
+      navigate("/lobby/host/shut");
+    }
+  };
 
   useEffect(() => {
     const fetchStatus = async () => {
