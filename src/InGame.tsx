@@ -27,6 +27,7 @@ const InGame: React.FC<Props> = ({
     { id: "p2", name: "田中", role: "THIEF", isCaptured: false },
     { id: "p3", name: "佐藤", role: "POLICE", isCaptured: false },
   ]);
+  const navigate = useNavigate();
 
   const currentPlayer = players.find((p) => p.id === currentPlayerId)!;
 
@@ -54,7 +55,6 @@ const InGame: React.FC<Props> = ({
       try {
         const player: Player[] = data.players;
         setPlayers(player);
-        const navigate = useNavigate();
         if (data.room.status === "CLOSED" || data.room.status === "WAITING") {
           //締め切り画面へ遷移
           navigate("/lobby/host");
