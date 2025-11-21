@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react"; // useEffectを一時削除
 import "./GamePreStart.css";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { useNavigate } from "react-router-dom";
@@ -9,13 +9,13 @@ interface Player {
   role: "POLICE" | "THIEF";
 }
 
-interface Props {
-  playerToken: string;
-  passcode: string;
-  apiBaseUrl: string;
-  socketUrl: string;
-  currentPlayerId?: string;
-}
+//interface Props { // 一時削除
+//  currentPlayerId?: string;
+//  playerToken?: string;
+//  passcode?: string;
+//  apiBaseUrl?: string;
+//  socketUrl?: string;
+//}
 
 const GamePreStart: React.FC = () => {
   const [gracePeriodRemaining, setgracePeriodRemaining] = useState<number>(60);
@@ -24,6 +24,7 @@ const GamePreStart: React.FC = () => {
     { id: "p2", name: "田中", role: "THIEF" },
     { id: "p3", name: "佐藤", role: "POLICE" },
   ]);
+  const navigate = useNavigate();
 
   useWebSocket(
     //websocket開始
@@ -32,7 +33,7 @@ const GamePreStart: React.FC = () => {
       try {
         alert("通信エラー");
         console.log(data);
-        const navigate = useNavigate();
+        //const navigate = useNavigate();
         if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
           //ゲーム開始画面へ遷移
           navigate("/game/ingame");

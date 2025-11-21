@@ -35,7 +35,7 @@ const LobbyHostShut: React.FC = () => {
   const [players, setPlayers] = useState<player[]>([]); //playerName,roleの配列定義
 
   useEffect(() => {
-    const data = getRoomStatus(
+    getRoomStatus(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     ).then((res) => {
@@ -55,9 +55,9 @@ const LobbyHostShut: React.FC = () => {
         const player: player[] = data.players;
         setLimitTime(data.room.durationSeconds);
         setThief(player.filter((player) => player.role === "THIEF").length);
-        setPoloce(player.filter((player) => player.role === "POLICE").length);
-        setplayers(player);
-        const navigate = useNavigate();
+        setPolice(player.filter((player) => player.role === "POLICE").length);
+        setPlayers(player);
+        //const navigate = useNavigate();
         if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
           //ゲーム開始画面へ遷移
           navigate("/game/ingame");

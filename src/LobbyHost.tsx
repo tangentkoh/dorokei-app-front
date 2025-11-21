@@ -60,7 +60,7 @@ const LobbyHost: React.FC = () => {
         setThief(player.filter((player) => player.role === "THIEF").length);
         setPolice(player.filter((player) => player.role === "POLICE").length);
         setPlayers(player);
-        const navigate = useNavigate();
+        //const navigate = useNavigate();
         if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
           //ゲーム開始画面へ遷移
           navigate("/game/ingame");
