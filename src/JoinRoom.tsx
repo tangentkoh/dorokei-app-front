@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, useLoaderData } from "react-router-dom"; // 🚨 useNavigate, useLoaderDataをインポート
-import "./JoinRoom.css";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import { joinRoom, type RoomResponse } from "./api"; // joinRoomをインポート
+import "./JoinRoom.css";
 
 // 認証情報のキーを定義 (main.tsxと同期)
 const PLAYER_TOKEN_KEY = "playerToken";
@@ -10,7 +10,6 @@ const PASSCODE_KEY = "passcode";
 // 以前のProps定義は削除
 
 const JoinRoom: React.FC = () => {
-  // 🚨 1. loaderからplayerNameを取得 (playerNameはstring型として保証されている)
   const playerName = useLoaderData() as string;
   const navigate = useNavigate();
 
@@ -54,9 +53,6 @@ const JoinRoom: React.FC = () => {
     }
   };
 
-  /**
-   * Title画面に戻る処理
-   */
   const goTitle = () => {
     navigate("/");
   };
