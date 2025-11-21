@@ -7,7 +7,7 @@
 // 環境変数が設定されていない場合、開発用のデフォルトURLを使用
 const API_BASE_URL: string =
   (import.meta.env.VITE_API_URL as string) ||
-  "https://dorokei-app-back.onrender.com/";
+  "https://dorokei-app-back.onrender.com";
 
 // API仕様書から取得
 export type PlayerRole = "POLICE" | "THIEF"; // [cite: 23]
@@ -49,7 +49,10 @@ const apiRequest = async <T>(
   auth: { playerToken?: string; passcode?: string },
   data: Record<string, unknown> | null = null
 ): Promise<T> => {
-  let url = `${API_BASE_URL}${endpoint}`;
+  const normalizedEndpoint = endpoint.startsWith("/")
+    ? endpoint
+    : `/${endpoint}`;
+  let url = `${API_BASE_URL}${normalizedEndpoint}`;
 
   // 認証情報(passcode)をクエリパラメータに追加 (認可・部屋特定のため) [cite: 4]
   if (auth.passcode) {
