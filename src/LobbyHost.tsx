@@ -7,16 +7,23 @@ import { useNavigate } from "react-router-dom";
 
 const LobbyHost: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
-  const [police, setPoloce] = useState<number>(0);
+  const [police, setPolice] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
-  const disbandRoom = () => {};
-  const changeRules = () => {};
+  const navigate = useNavigate();
+
+  const disbandRoom = () => {
+    navigate("/");
+  };
+  const changeRules = () => {
+    navigate("/lobby/settings", { state: { from: "/lobby/host" } });
+  };
   const shutRoom = async (): Promise<void> => {
     closeRoom(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
     );
+    navigate("/lobby/host/shut");
   };
 
   type player = {
@@ -26,12 +33,6 @@ const LobbyHost: React.FC = () => {
     isCaptured: boolean;
   };
 
-  useEffect(() => {
-    getRoomStatus(
-      localStorage.getItem("playerToken") ?? "",
-      localStorage.getItem("passcode") ?? ""
-    );
-  }, []);
   //{ id: "player-1", name: "名前 1", role: "THIEF", isCaptured: false },
   const [players, setPlayers] = useState<player[]>([]);
 
@@ -39,7 +40,13 @@ const LobbyHost: React.FC = () => {
     getRoomStatus(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
-    );
+    ).then((res) => {
+      // res が RoomStatusResponse
+      setPlayers(res.players); // ← ここで state に反映
+      setLimitTime(res.room.durationSeconds);
+      setPolice(res.players.filter((p) => p.role === "POLICE").length);
+      setThief(res.players.filter((p) => p.role === "THIEF").length);
+    });
   }, []);
 
   useWebSocket(
@@ -51,7 +58,7 @@ const LobbyHost: React.FC = () => {
 
         setLimitTime(data.room.durationSeconds);
         setThief(player.filter((player) => player.role === "THIEF").length);
-        setPoloce(player.filter((player) => player.role === "POLICE").length);
+        setPolice(player.filter((player) => player.role === "POLICE").length);
         setPlayers(player);
         const navigate = useNavigate();
         if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
