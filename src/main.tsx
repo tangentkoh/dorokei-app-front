@@ -135,14 +135,7 @@ const router = createBrowserRouter([
       { path: "/disband", element: <Disband />, loader: authGuardLoader },
       {
         path: "/game/prestart",
-        element: (
-          <GamePreStart
-            playerToken={""}
-            passcode={""}
-            apiBaseUrl={""}
-            socketUrl={""}
-          />
-        ),
+        element: <GamePreStart />,
         loader: authGuardLoader,
       },
       { path: "/game/ingame", element: <InGame />, loader: authGuardLoader },
