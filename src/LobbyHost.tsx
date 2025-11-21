@@ -40,7 +40,13 @@ const LobbyHost: React.FC = () => {
     getRoomStatus(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
-    );
+    ).then((res) => {
+      // res が RoomStatusResponse
+      setPlayers(res.players); // ← ここで state に反映
+      setLimitTime(res.room.durationSeconds);
+      setPolice(res.players.filter((p) => p.role === "POLICE").length);
+      setThief(res.players.filter((p) => p.role === "THIEF").length);
+    });
   }, []);
 
   useWebSocket(

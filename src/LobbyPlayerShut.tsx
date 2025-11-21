@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const LobbyPlayerShut: React.FC = () => {
   const [limitTime, setLimitTime] = useState<number>(0);
-  const [police, setPoloce] = useState<number>(0);
+  const [police, setPolice] = useState<number>(0);
   const [thief, setThief] = useState<number>(0);
 
   const navigate = useNavigate();
@@ -17,13 +17,19 @@ const LobbyPlayerShut: React.FC = () => {
     role: "POLICE" | "THIEF";
     isCaptured: boolean;
   };
-  const [players, setplayers] = useState<player[]>([]); //playerName,roleの配列定義
+  const [players, setPlayers] = useState<player[]>([]); //playerName,roleの配列定義
 
   useEffect(() => {
     getRoomStatus(
       localStorage.getItem("playerToken") ?? "",
       localStorage.getItem("passcode") ?? ""
-    );
+    ).then((res) => {
+      // res が RoomStatusResponse
+      setPlayers(res.players); // ← ここで state に反映
+      setLimitTime(res.room.durationSeconds);
+      setPolice(res.players.filter((p) => p.role === "POLICE").length);
+      setThief(res.players.filter((p) => p.role === "THIEF").length);
+    });
   }, []);
 
   useWebSocket(
@@ -34,8 +40,8 @@ const LobbyPlayerShut: React.FC = () => {
         const player: player[] = data.players;
         setLimitTime(data.room.durationSeconds);
         setThief(player.filter((player) => player.role === "THIEF").length);
-        setPoloce(player.filter((player) => player.role === "POLICE").length);
-        setplayers(player);
+        setPolice(player.filter((player) => player.role === "POLICE").length);
+        setPlayers(player);
       } catch (e) {
         console.error("WebSocketデータの解析に失敗", e);
       }
