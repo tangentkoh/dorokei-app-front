@@ -1,43 +1,77 @@
 .prestart-container {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
+  width: 100%;
+  height: 100vh;
   padding: 20px;
+  background: #f2f2f2;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* 大きく表示される自分の役職 */
+.my-role-box {
+  font-size: 48px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  width: 60%;
+  color: white;
+}
+
+.my-role-box.police {
+  background: #1e90ff;
+}
+
+.my-role-box.thief {
+  background: #ff6347;
+}
+
+.grace-time {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.member-title {
+  font-size: 22px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .player-list {
   list-style: none;
   padding: 0;
-  margin: 20px 0;
+  width: 80%;
+  margin: 0 auto;
 }
 
 .player-list li {
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid #ccc;
+  padding: 10px 15px;
+  background: #fff;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.player-list .police {
-  color: #1e90ff;
-  font-weight: bold;
-}
-
-.player-list .thief {
-  color: #ff4500;
-  font-weight: bold;
-}
-
-.start-button {
-  background-color: #28a745;
+.role-tag {
+  padding: 4px 10px;
+  border-radius: 8px;
   color: white;
   font-weight: bold;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
-.start-button:hover {
-  background-color: #218838;
+.role-tag.police {
+  background: #1e90ff;
+}
+
+.role-tag.thief {
+  background: #ff6347;
+}
+
+.waiting-message {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #333;
 }
