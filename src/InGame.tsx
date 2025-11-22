@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./InGame.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { capturePlayer, releasePlayer, leaveRoom, getRoomStatus } from "./api";
 import { useNavigate } from "react-router-dom";
 
 interface Player {
@@ -10,121 +11,90 @@ interface Player {
   isCaptured: boolean;
 }
 
-interface Props {
-  currentPlayerId?: string;
-  playerToken?: string;
-  passcode?: string;
-  apiBaseUrl?: string;
-  socketUrl?: string;
-}
-
-const InGame: React.FC<Props> = ({
-  currentPlayerId = "p1", // デフォルト値
-}) => {
-  const [remaining, setRemaining] = useState(300);
-  const [players, setPlayers] = useState<Player[]>([
-    { id: "p1", name: "自分", role: "THIEF", isCaptured: false },
-    { id: "p2", name: "田中", role: "THIEF", isCaptured: false },
-    { id: "p3", name: "佐藤", role: "POLICE", isCaptured: false },
-  ]);
+const InGame: React.FC = () => {
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const navigate = useNavigate();
 
-  const currentPlayer = players.find((p) => p.id === currentPlayerId)!;
+  const playerToken = localStorage.getItem("playerToken") || "";
+  const passcode = localStorage.getItem("passcode") || "";
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setRemaining((r) => (r > 0 ? r - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
+    getRoomStatus(playerToken, passcode).then((res) => {
+      setPlayers(res.players);
+      setRemainingSeconds(res.room.durationSeconds);
+    });
   }, []);
 
-  const toggleCapture = () => {
+  const handleCapture = async (playerId: string) => {
+    await capturePlayer(playerToken, passcode, playerId);
     setPlayers((prev) =>
       prev.map((p) =>
-        p.id === currentPlayer.id ? { ...p, isCaptured: !p.isCaptured } : p
+        p.id === playerId ? { ...p, isCaptured: true } : p
       )
     );
   };
 
-  const capturedList = players.filter((p) => p.isCaptured);
+  const handleRelease = async (playerId: string) => {
+    await releasePlayer(playerToken, passcode, playerId);
+    setPlayers((prev) =>
+      prev.map((p) =>
+        p.id === playerId ? { ...p, isCaptured: false } : p
+      )
+    );
+  };
+
+  const handleLeave = async () => {
+    await leaveRoom(playerToken, passcode);
+    navigate("/");
+  };
 
   useWebSocket(
-    //websocket開始
     "https://dorokei-app-back.onrender.com/",
     (data) => {
-      try {
-        const player: Player[] = data.players;
-        setPlayers(player);
-        if (data.room.status === "CLOSED" || data.room.status === "WAITING") {
-          //締め切り画面へ遷移
-          navigate("/lobby/host");
-        }
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
+      // game:statusUpdated
+      setPlayers(data.players);
+      if (data.room.status === "FINISHED") {
+        navigate("/game/result");
       }
     },
-    (data) => {
-      try {
-        setRemaining(data.remainingSeconds);
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
-      }
-    },
-    (data) => {
-      try {
-        if (data.reason === "TERMINATED_BY_HOST") {
-          alert(data.message);
-          console.log(data.timestamp);
-        } else if (data.reason === "TIME_UP") {
-          alert(data.message);
-          console.log(data);
-        } else if (data.reason === "ALL_CAPTURED") {
-          alert(data.message);
-          console.log(data);
-        } else {
-          alert("通信エラー");
-          console.log(data);
-        }
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
-      }
-    }
+    (data) => setRemainingSeconds(data.remainingSeconds),
+    (data) => alert(data.message)
   );
 
   return (
-    <div className="text-center">
-      <h2 className="text-xl font-bold mb-3">ゲーム進行中</h2>
-      <p className="text-lg mb-4">残り時間：{remaining} 秒</p>
+    <div className="ingame-container">
+      <button className="leave-button" onClick={handleLeave}>離脱</button>
 
-      <h3 className="font-semibold mb-2">捕まっているプレイヤー</h3>
-      <ul className="border rounded p-2 text-left min-h-[50px] mb-4">
-        {capturedList.length ? (
-          capturedList.map((p) => (
-            <li key={p.id} className="text-red-600">
-              {p.name}
-            </li>
-          ))
-        ) : (
-          <li className="text-gray-400">なし</li>
-        )}
+      <h2>ゲーム進行中</h2>
+      <p>残り時間：{remainingSeconds} 秒</p>
+
+      <ul className="player-list">
+        {players.map((p) => (
+          <li key={p.id}>
+            <span>{p.name}</span>
+            <span className={p.role === "POLICE" ? "police" : "thief"}>
+              {p.role === "POLICE" ? "警察" : "逃走者"}
+            </span>
+            {p.role === "POLICE" && !p.isCaptured && (
+              <button
+                className="action-button capture"
+                onClick={() => handleCapture(p.id)}
+              >
+                確保
+              </button>
+            )}
+            {p.role === "THIEF" && p.isCaptured && (
+              <button
+                className="action-button release"
+                onClick={() => handleRelease(p.id)}
+              >
+                解放
+              </button>
+            )}
+          </li>
+        ))}
       </ul>
-
-      {currentPlayer.role === "THIEF" && (
-        <button
-          onClick={toggleCapture}
-          className={`px-4 py-2 rounded font-bold text-white ${
-            currentPlayer.isCaptured ? "bg-green-500" : "bg-red-500"
-          }`}
-        >
-          {currentPlayer.isCaptured ? "復活した！" : "捕まった！"}
-        </button>
-      )}
-
-      {currentPlayer.role === "POLICE" && (
-        <p className="text-blue-600 font-semibold">警察モード中</p>
-      )}
-
-      <p className="text-sm text-gray-500 mt-3">（ダミーモード：通信なし）</p>
     </div>
   );
 };
