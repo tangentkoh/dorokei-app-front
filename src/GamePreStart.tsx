@@ -1,95 +1,77 @@
-import React, { useState } from "react"; // useEffectを一時削除
+import React, { useState, useEffect } from "react";
 import "./GamePreStart.css";
 import { useWebSocket } from "./hooks/useWebSocket";
+import { getRoomStatus, startGame } from "./api";
 import { useNavigate } from "react-router-dom";
 
 interface Player {
   id: string;
   name: string;
   role: "POLICE" | "THIEF";
+  isCaptured: boolean;
 }
 
-//interface Props { // 一時削除
-//  currentPlayerId?: string;
-//  playerToken?: string;
-//  passcode?: string;
-//  apiBaseUrl?: string;
-//  socketUrl?: string;
-//}
-
 const GamePreStart: React.FC = () => {
-  const [gracePeriodRemaining, setgracePeriodRemaining] = useState<number>(60);
-  const [players] = useState<Player[]>([
-    { id: "p1", name: "自分", role: "THIEF" },
-    { id: "p2", name: "田中", role: "THIEF" },
-    { id: "p3", name: "佐藤", role: "POLICE" },
-  ]);
+  const [gracePeriodRemaining, setGracePeriodRemaining] = useState<number>(0);
+  const [players, setPlayers] = useState<Player[]>([]);
   const navigate = useNavigate();
 
+  const playerToken = localStorage.getItem("playerToken") || "";
+  const passcode = localStorage.getItem("passcode") || "";
+
+  useEffect(() => {
+    getRoomStatus(playerToken, passcode).then((res) => {
+      setPlayers(res.players);
+      setGracePeriodRemaining(res.room.gracePeriodSeconds);
+    });
+  }, []);
+
+  // WebSocket でリアルタイム更新
   useWebSocket(
-    //websocket開始
     "https://dorokei-app-back.onrender.com/",
     (data) => {
-      try {
-        alert("通信エラー");
-        console.log(data);
-        //const navigate = useNavigate();
-        if (data.room.status === "IN_GAME" || data.room.status === "FINISHED") {
-          //ゲーム開始画面へ遷移
-          navigate("/game/ingame");
-        } else if (data.room.status === "WAITING") {
-          //締め切り画面へ遷移
-          navigate("/lobby/host");
-        }
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
+      // game:statusUpdated
+      setPlayers(data.players);
+      if (data.room.status === "IN_GAME") {
+        navigate("/game/ingame");
+      } else if (data.room.status === "CLOSED" || data.room.status === "WAITING") {
+        navigate("/lobby/host");
       }
     },
     (data) => {
-      try {
-        setgracePeriodRemaining(data.gracePeriodRemaining);
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
-      }
+      // game:timerTick
+      if (data.isGracePeriod) setGracePeriodRemaining(data.gracePeriodRemaining || 0);
     },
     (data) => {
-      try {
-        if (data.reason === "TERMINATED_BY_HOST") {
-          alert(data.message);
-          console.log(data.timestamp);
-        } else {
-          alert("通信エラー");
-          console.log(data);
-        }
-      } catch (e) {
-        console.error("WebSocketデータの解析に失敗", e);
-      }
+      // game:terminatedNotification
+      alert(data.message);
     }
   );
 
-  return (
-    <div className="text-center">
-      <h2 className="text-xl font-bold mb-3">逃走準備中</h2>
-      <p className="text-lg mb-4">残り時間：{gracePeriodRemaining} 秒</p>
+  const handleStartGame = async () => {
+    await startGame(playerToken, passcode);
+    navigate("/game/ingame");
+  };
 
-      <ul className="border rounded p-2 text-left">
+  return (
+    <div className="prestart-container">
+      <h2>逃走準備中</h2>
+      <p>残り猶予時間：{gracePeriodRemaining} 秒</p>
+
+      <ul className="player-list">
         {players.map((p) => (
-          <li key={p.id} className="flex justify-between border-b py-1">
+          <li key={p.id}>
             <span>{p.name}</span>
-            <span
-              className={
-                p.role === "POLICE"
-                  ? "text-blue-600 font-semibold"
-                  : "text-red-500 font-semibold"
-              }
-            >
+            <span className={p.role === "POLICE" ? "police" : "thief"}>
               {p.role === "POLICE" ? "警察" : "逃走者"}
             </span>
           </li>
         ))}
       </ul>
 
-      <p className="text-sm text-gray-500 mt-3">（ダミーモード：通信なし）</p>
+      <button className="start-button" onClick={handleStartGame}>
+        ゲーム開始
+      </button>
     </div>
   );
 };

@@ -1,49 +1,43 @@
-.game-container {
+.prestart-container {
+  max-width: 600px;
+  margin: 0 auto;
   text-align: center;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 20px;
 }
 
 .player-list {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 0.5rem;
   list-style: none;
+  padding: 0;
+  margin: 20px 0;
 }
 
-.player-item {
+.player-list li {
   display: flex;
   justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
+  padding: 6px 0;
+  border-bottom: 1px solid #ccc;
 }
 
-.role-thief {
-  color: #ef4444;
+.player-list .police {
+  color: #1e90ff;
   font-weight: bold;
 }
 
-.role-police {
-  color: #2563eb;
+.player-list .thief {
+  color: #ff4500;
   font-weight: bold;
 }
 
-.button {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 6px;
+.start-button {
+  background-color: #28a745;
   color: white;
   font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 0.5rem;
 }
 
-.button-danger {
-  background-color: #ef4444;
-}
-
-.button-success {
-  background-color: #10b981;
+.start-button:hover {
+  background-color: #218838;
 }

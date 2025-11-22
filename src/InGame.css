@@ -1,49 +1,59 @@
-.game-container {
+.ingame-container {
+  max-width: 700px;
+  margin: 0 auto;
   text-align: center;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.leave-button {
+  float: right;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .player-list {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 0.5rem;
   list-style: none;
+  padding: 0;
+  margin-top: 20px;
 }
 
-.player-item {
+.player-list li {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ccc;
+  padding: 6px 0;
 }
 
-.role-thief {
-  color: #ef4444;
+.player-list .police {
+  color: #1e90ff;
   font-weight: bold;
 }
 
-.role-police {
-  color: #2563eb;
+.player-list .thief {
+  color: #ff4500;
   font-weight: bold;
 }
 
-.button {
-  padding: 0.6rem 1.2rem;
-  border: none;
+.action-button {
+  margin-left: 10px;
+  padding: 4px 8px;
   border-radius: 6px;
-  color: white;
-  font-weight: bold;
+  border: none;
   cursor: pointer;
-  margin-top: 0.5rem;
+  font-weight: bold;
 }
 
-.button-danger {
-  background-color: #ef4444;
+.action-button.capture {
+  background-color: #28a745;
+  color: white;
 }
 
-.button-success {
-  background-color: #10b981;
+.action-button.release {
+  background-color: #ffc107;
+  color: black;
 }
