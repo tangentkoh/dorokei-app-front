@@ -280,3 +280,9 @@ export const releasePlayer = async (
   // リクエストBodyは (なし) [cite: 30]
   return apiRequest<{ message: string }>(endpoint, "PATCH", auth); // [cite: 30]
 };
+
+export const leaveRoom = async (playerToken: string, passcode: string) => {
+  const endpoint = `/rooms/leave`; // [cite: 31]
+  const auth = { playerToken, passcode };
+  return apiRequest<{ message: string }>(endpoint, "POST", auth); // [cite: 31]
+};
