@@ -12,7 +12,7 @@ interface Player {
 }
 
 const GamePreStart: React.FC = () => {
-  const [gracePeriodRemaining, setGracePeriodRemaining] = useState<number>(0);
+  const [gracePeriodRemaining, setGracePeriodRemaining] = useState<number>(60);
   const [players, setPlayers] = useState<Player[]>([]);
   const navigate = useNavigate();
 
