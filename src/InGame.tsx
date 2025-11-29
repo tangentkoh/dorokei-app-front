@@ -24,23 +24,19 @@ const InGame: React.FC = () => {
       setPlayers(res.players);
       setRemainingSeconds(res.room.durationSeconds);
     });
-  }, []);
+  });
 
   const handleCapture = async (playerId: string) => {
     await capturePlayer(playerToken, passcode, playerId);
     setPlayers((prev) =>
-      prev.map((p) =>
-        p.id === playerId ? { ...p, isCaptured: true } : p
-      )
+      prev.map((p) => (p.id === playerId ? { ...p, isCaptured: true } : p))
     );
   };
 
   const handleRelease = async (playerId: string) => {
     await releasePlayer(playerToken, passcode, playerId);
     setPlayers((prev) =>
-      prev.map((p) =>
-        p.id === playerId ? { ...p, isCaptured: false } : p
-      )
+      prev.map((p) => (p.id === playerId ? { ...p, isCaptured: false } : p))
     );
   };
 
@@ -64,7 +60,9 @@ const InGame: React.FC = () => {
 
   return (
     <div className="ingame-container">
-      <button className="leave-button" onClick={handleLeave}>離脱</button>
+      <button className="leave-button" onClick={handleLeave}>
+        離脱
+      </button>
 
       <h2>ゲーム進行中</h2>
       <p>残り時間：{remainingSeconds} 秒</p>
